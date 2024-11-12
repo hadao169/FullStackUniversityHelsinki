@@ -15,6 +15,7 @@ const Course = ({ course }) => {
             );
           })}
         </ul>
+        <Total parts={course.parts} />
       </>
     );
   } else {

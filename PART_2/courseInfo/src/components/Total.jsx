@@ -2,7 +2,7 @@ const Total = ({ parts }) => {
   return (
     <p>
       Total number of exercises are{" "}
-      {parts[0].exercises + parts[1].exercises + parts[2].exercises} exercise
+      {parts.reduce((acc, part) => acc + part.exercises, 0)}
     </p>
   );
 };
