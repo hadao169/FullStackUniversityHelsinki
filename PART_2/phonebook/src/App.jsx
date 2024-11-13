@@ -10,7 +10,7 @@ const App = () => {
 
   const handleAddName = (event) => {
     event.preventDefault();
-    setPersons([...persons, { name: newName }]);
+    setPersons([...persons,{ name: newName }]);
     console.log(persons.length);
     setNewName("");
   };
