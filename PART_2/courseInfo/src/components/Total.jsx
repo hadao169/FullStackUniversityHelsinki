@@ -1,6 +1,6 @@
 const Total = ({ parts }) => {
   return (
-    <p>
+    <p className="total">
       Total number of exercises are {"  "}
       {parts.reduce((acc, part) => acc + part.exercises, 0)}
     </p>

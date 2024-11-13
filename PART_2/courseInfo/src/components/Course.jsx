@@ -9,9 +9,9 @@ const Course = ({ course }) => {
         <ul>
           {course.parts.map((part) => {
             return (
-              <li key={part.id}>
+              <div key={part.id}>
                 <Content part={part} />
-              </li>
+              </div>
             );
           })}
         </ul>
