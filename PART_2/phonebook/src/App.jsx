@@ -20,7 +20,7 @@ const App = () => {
     const newContact = { name: newName, phoneNumber: newNumber };
     if (isDuplicate(persons) === false) {
       setPersons([...persons, newContact]);
-      setNewName("");
+      setNewName(" ");
       setNewNumber("");
     } else {
       alert(`${newName} is already added to the phonebook.`);
