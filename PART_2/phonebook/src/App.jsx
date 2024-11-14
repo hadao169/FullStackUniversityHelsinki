@@ -1,4 +1,49 @@
 import { useState } from "react";
+const PersonForm = ({
+  onAddName,
+  onNameChange,
+  onNumberChange,
+  newName,
+  newNumber,
+}) => {
+  return (
+    <form onSubmit={onAddName}>
+      <div>
+        name: <input value={newName} onChange={onNameChange} />
+      </div>
+      {/* Create an Input component */}
+      <div>
+        number: <input value={newNumber} onChange={onNumberChange} />
+      </div>
+      <div>
+        <button type="submit">add</button>
+      </div>
+    </form>
+  );
+};
+
+const Persons = ({ persons }) => {
+  return (
+    <div>
+      {persons.map((person) => {
+        return (
+          <div key={person.name}>
+            {person.name} {person.phoneNumber}
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+const Filter = ({ searchTerm, onSearch }) => {
+  return (
+    <div>
+      Filter shown with{": "}
+      <input value={searchTerm} onChange={onSearch} />
+    </div>
+  );
+};
 
 const App = () => {
   const [persons, setPersons] = useState([
@@ -50,40 +95,24 @@ const App = () => {
   // };
 
   //handle "filter by name" logic which is case insensitivity
-  const handleFilter = (p) => {
-    p.name.toLowerCase().includes(searchTerm.toLowerCase());
-  };
+  const filteredPersons = persons.filter((person) =>
+    person.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div>
       <h2>Phonebook</h2>
-      <div>
-        Filter shown with{": "}
-        <input value={searchTerm} onChange={handleSearchNameChange} />
-      </div>
+      <Filter searchTerm={searchTerm} onSearch={handleSearchNameChange} />
       <h2>Add a new</h2>
-      <form onSubmit={handleAddName}>
-        <div>
-          name: <input value={newName} onChange={handleNameChange} />
-        </div>
-        {/* Create an Input component */}
-        <div>
-          number: <input value={newNumber} onChange={handlePhoneNumberChange} />
-        </div>
-        <div>
-          <button type="submit">add</button>
-        </div>
-      </form>
+      <PersonForm
+        newName={newName}
+        newNumber={newNumber}
+        onNameChange={handleNameChange}
+        onNumberChange={handlePhoneNumberChange}
+        onAddName={handleAddName}
+      />
       <h2>Numbers</h2>
-      <div>
-        {persons.filter(handleFilter).map((person) => {
-          return (
-            <div key={person.name}>
-              {person.name} {person.phoneNumber}
-            </div>
-          );
-        })}
-      </div>
+      <Persons persons={filteredPersons} />
     </div>
   );
 };
