@@ -36,6 +36,11 @@ const App = () => {
     return false;
   };
 
+  // => Should use some method
+  // const isDuplicate = (personsList, name) => {
+  //   return personsList.some((person) => person.name === name);
+  // };  
+
   return (
     <div>
       <h2>Phonebook</h2>
