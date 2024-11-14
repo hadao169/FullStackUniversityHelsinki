@@ -2,10 +2,14 @@ import { useState } from "react";
 
 const App = () => {
   const [persons, setPersons] = useState([
-    { name: "Arto Hellas", phoneNumber: "040-1234567" },
+    { name: "Arto Hellas", number: "040-123456", id: 1 },
+    { name: "Ada Lovelace", number: "39-44-5323523", id: 2 },
+    { name: "Dan Abramov", number: "12-43-234345", id: 3 },
+    { name: "Mary Poppendieck", number: "39-23-6423122", id: 4 },
   ]);
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
 
   const handleNameChange = (e) => {
     setNewName(e.target.value);
@@ -13,6 +17,10 @@ const App = () => {
 
   const handlePhoneNumberChange = (e) => {
     setNewNumber(e.target.value);
+  };
+
+  const handleSearchNameChange = (e) => {
+    setSearchTerm(e.target.value);
   };
 
   const handleAddName = (event) => {
@@ -36,14 +44,24 @@ const App = () => {
     return false;
   };
 
-  // => Should use some method
+  // => Should use 'some' method
   // const isDuplicate = (personsList, name) => {
   //   return personsList.some((person) => person.name === name);
-  // };  
+  // };
+
+  //handle "filter by name" logic which is case insensitivity
+  const handleFilter = (p) => {
+    p.name.toLowerCase().includes(searchTerm.toLowerCase());
+  };
 
   return (
     <div>
       <h2>Phonebook</h2>
+      <div>
+        Filter shown with{": "}
+        <input value={searchTerm} onChange={handleSearchNameChange} />
+      </div>
+      <h2>Add a new</h2>
       <form onSubmit={handleAddName}>
         <div>
           name: <input value={newName} onChange={handleNameChange} />
@@ -58,7 +76,7 @@ const App = () => {
       </form>
       <h2>Numbers</h2>
       <div>
-        {persons.map((person) => {
+        {persons.filter(handleFilter).map((person) => {
           return (
             <div key={person.name}>
               {person.name} {person.phoneNumber}
@@ -69,5 +87,4 @@ const App = () => {
     </div>
   );
 };
-
 export default App;
