@@ -3,3 +3,23 @@
   flex-direction: column;
   gap: 10px;
 }
+
+.deleteBtn{
+  margin-left: 10px;
+  margin-bottom: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.addBtn{
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.addBtn:hover{
+  background-color: lightblue;
+}
+
+.deleteBtn:hover{
+  background-color: lightblue;
+}

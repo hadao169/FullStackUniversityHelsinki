@@ -19,20 +19,24 @@ const PersonForm = ({
         number: <input value={newNumber} onChange={onNumberChange} />
       </div>
       <div>
-        <button type="submit">add</button>
+        <button type="submit" className="addBtn">
+          add
+        </button>
       </div>
     </form>
   );
 };
 
-const Persons = ({ persons }) => {
+const Persons = ({ persons, onDelete }) => {
   return (
     <div>
       {persons.map((person) => {
         return (
           <div key={person.id}>
             {person.name} {person.number}
-            {console.log(person.id)}
+            <button className="deleteBtn" onClick={() => onDelete(person.id)}>
+              Delete
+            </button>
           </div>
         );
       })}
@@ -67,6 +71,21 @@ const App = () => {
       });
   }, []);
 
+  const handleDeleteContact = (id) => {
+    if (window.confirm("Are you sure you want to delete this contact?")) {
+      personService
+
+        .deletes(id)
+        .then(() => {
+          // Update state by filtering out the deleted contact
+          setPersons(persons.filter((person) => person.id !== id));
+        })
+        .catch((err) => {
+          console.error("Error deleting contact:", err);
+        });
+    }
+  };
+
   const handleNameChange = (e) => {
     setNewName(e.target.value);
   };
@@ -84,8 +103,13 @@ const App = () => {
     const newContact = {
       name: newName,
       number: newNumber,
-      id: persons.length + 1,
+      id: (persons.length + 1).toString(),
     };
+
+    personService
+      .create(newContact)
+      .then((returnedContact) => setPersons(persons.concat(returnedContact)));
+
     if (isDuplicate(persons) === false) {
       setPersons([...persons, newContact]);
       setNewName(" ");
@@ -110,9 +134,12 @@ const App = () => {
   // };
 
   //handle "filter by name" logic which is case insensitivity
-  const filteredPersons = persons.filter((person) =>
-    person.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredPersons = persons.filter((person) => {
+    console.log("person: ", person);
+    const check = person.name.toLowerCase().includes(searchTerm.toLowerCase());
+    console.log("check ", check);
+    return check;
+  });
 
   return (
     <div>
@@ -127,7 +154,7 @@ const App = () => {
         onAddName={handleAddName}
       />
       <h2>Numbers</h2>
-      <Persons persons={filteredPersons} />
+      <Persons persons={filteredPersons} onDelete={handleDeleteContact} />
     </div>
   );
 };
