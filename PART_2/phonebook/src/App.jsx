@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import "./App.css";
+import personService from "./services/persons.js";
 
 const PersonForm = ({
   onAddName,
@@ -30,8 +30,9 @@ const Persons = ({ persons }) => {
     <div>
       {persons.map((person) => {
         return (
-          <div key={person.name}>
-            {person.name} {person.phoneNumber}
+          <div key={person.id}>
+            {person.name} {person.number}
+            {console.log(person.id)}
           </div>
         );
       })}
@@ -56,9 +57,14 @@ const App = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
-    axios.get("http://localhost:3001/persons").then((response) => {
-      setPersons(response.data);
-    });
+    personService
+      .getAll()
+      .then((initialPersons) => {
+        setPersons(initialPersons);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }, []);
 
   const handleNameChange = (e) => {
@@ -75,7 +81,11 @@ const App = () => {
 
   const handleAddName = (event) => {
     event.preventDefault();
-    const newContact = { name: newName, phoneNumber: newNumber };
+    const newContact = {
+      name: newName,
+      number: newNumber,
+      id: persons.length + 1,
+    };
     if (isDuplicate(persons) === false) {
       setPersons([...persons, newContact]);
       setNewName(" ");
