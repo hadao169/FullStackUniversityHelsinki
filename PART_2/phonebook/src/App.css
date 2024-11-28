@@ -23,3 +23,15 @@
 .deleteBtn:hover{
   background-color: lightblue;
 }
+
+.error {
+  color: green;
+  background: lightgrey;
+  font-size: 20px;
+  border-radius: 5px;
+  border: 2px green solid;
+  padding: 10px;
+  margin-bottom: 10px;
+  width: 30%;
+  height: fit-content;
+}

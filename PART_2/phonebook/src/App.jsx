@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import "./App.css";
 import personService from "./services/persons.js";
 
 const PersonForm = ({
@@ -53,12 +52,21 @@ const Filter = ({ searchTerm, onSearch }) => {
   );
 };
 
+const Notification = ({ message }) => {
+  if (message === null) {
+    return null;
+  }
+
+  return <div className="error">{message}</div>;
+};
+
 const App = () => {
   const [persons, setPersons] = useState([]);
 
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
     personService
@@ -70,21 +78,6 @@ const App = () => {
         console.log(err);
       });
   }, []);
-
-  const handleDeleteContact = (id) => {
-    if (window.confirm("Are you sure you want to delete this contact?")) {
-      personService
-
-        .deletes(id)
-        .then(() => {
-          // Update state by filtering out the deleted contact
-          setPersons(persons.filter((person) => person.id !== id));
-        })
-        .catch((err) => {
-          console.error("Error deleting contact:", err);
-        });
-    }
-  };
 
   const handleNameChange = (e) => {
     setNewName(e.target.value);
@@ -100,22 +93,52 @@ const App = () => {
 
   const handleAddName = (event) => {
     event.preventDefault();
+
     const newContact = {
       name: newName,
       number: newNumber,
       id: (persons.length + 1).toString(),
     };
 
-    personService
-      .create(newContact)
-      .then((returnedContact) => setPersons(persons.concat(returnedContact)));
-
-    if (isDuplicate(persons) === false) {
-      setPersons([...persons, newContact]);
-      setNewName(" ");
+    if (!isDuplicate(persons)) {
+      personService.create(newContact).then((returnedContact) => {
+        setPersons(persons.concat(returnedContact));
+        setErrorMessage(`Added ${newContact.name}`);
+      });
+      setTimeout(() => {
+        setErrorMessage("");
+      }, 4000);
+      setNewName("");
       setNewNumber("");
     } else {
-      alert(`${newName} is already added to the phonebook.`);
+      const changedPerson = persons.find((person) => person.name === newName);
+      if (
+        window.confirm(
+          `${changedPerson.name} is already added to phonebook, replace the old number with a new one?`
+        )
+      ) {
+        if (changedPerson) {
+          const updatedPerson = { ...changedPerson, number: newNumber };
+
+          personService
+            .update(changedPerson.id, updatedPerson)
+            .then((returnedContact) => {
+              setPersons(
+                persons.map((person) =>
+                  person.id !== returnedContact.id ? person : returnedContact
+                )
+              );
+              setErrorMessage(
+                `${updatedPerson.name}'s phonenumber has been changed!`
+              );
+              setTimeout(() => {
+                setErrorMessage("");
+              }, 4000);
+              setNewName("");
+              setNewNumber("");
+            });
+        }
+      }
     }
   };
 
@@ -133,17 +156,31 @@ const App = () => {
   //   return personsList.some((person) => person.name === name);
   // };
 
+  const handleDeleteContact = (id) => {
+    const contactRemoved = persons.find((person) => person.id === id);
+    if (window.confirm(`Delete ${contactRemoved.name}`)) {
+      personService
+
+        .deletes(id)
+        .then(() => {
+          // Update state by filtering out the deleted contact
+          setPersons(persons.filter((person) => person.id !== id));
+        })
+        .catch((err) => {
+          console.error("Error deleting contact:", err);
+        });
+    }
+  };
+
   //handle "filter by name" logic which is case insensitivity
-  const filteredPersons = persons.filter((person) => {
-    console.log("person: ", person);
-    const check = person.name.toLowerCase().includes(searchTerm.toLowerCase());
-    console.log("check ", check);
-    return check;
-  });
+  const filteredPersons = persons.filter((person) =>
+    person.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={errorMessage} />
       <Filter searchTerm={searchTerm} onSearch={handleSearchNameChange} />
       <h2>Add a new</h2>
       <PersonForm
