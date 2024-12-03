@@ -11,11 +11,10 @@ const PersonForm = ({
   return (
     <form onSubmit={onAddName} className="form">
       <div>
-        name: <input value={newName} onChange={onNameChange} />
+        name: <input value={newName} onChange={onNameChange} required />
       </div>
-      {/* Create an Input component */}
       <div>
-        number: <input value={newNumber} onChange={onNumberChange} />
+        number: <input value={newNumber} onChange={onNumberChange} required />
       </div>
       <div>
         <button type="submit" className="addBtn">
@@ -62,11 +61,10 @@ const Notification = ({ message }) => {
 
 const App = () => {
   const [persons, setPersons] = useState([]);
-
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
+  const [message, setMessage] = useState("");
 
   useEffect(() => {
     personService
@@ -101,15 +99,20 @@ const App = () => {
     };
 
     if (!isDuplicate(persons)) {
-      personService.create(newContact).then((returnedContact) => {
-        setPersons(persons.concat(returnedContact));
-        setErrorMessage(`Added ${newContact.name}`);
-      });
-      setTimeout(() => {
-        setErrorMessage("");
-      }, 4000);
-      setNewName("");
-      setNewNumber("");
+      personService
+        .create(newContact)
+        .then((returnedContact) => {
+          setPersons(persons.concat(returnedContact));
+          setMessage(`Added ${newContact.name}`);
+          setTimeout(() => {
+            setMessage("");
+          }, 4000);
+          setNewName("");
+          setNewNumber("");
+        })
+        .catch((err) => {
+          console.log("Errors occurred", err);
+        });
     } else {
       const changedPerson = persons.find((person) => person.name === newName);
       if (
@@ -128,14 +131,17 @@ const App = () => {
                   person.id !== returnedContact.id ? person : returnedContact
                 )
               );
-              setErrorMessage(
+              setMessage(
                 `${updatedPerson.name}'s phonenumber has been changed!`
               );
               setTimeout(() => {
-                setErrorMessage("");
+                setMessage("");
               }, 4000);
               setNewName("");
               setNewNumber("");
+            })
+            .catch((err) => {
+              console.log("Errors occurred", err);
             });
         }
       }
@@ -180,7 +186,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification message={errorMessage} />
+      <Notification message={message} />
       <Filter searchTerm={searchTerm} onSearch={handleSearchNameChange} />
       <h2>Add a new</h2>
       <PersonForm
