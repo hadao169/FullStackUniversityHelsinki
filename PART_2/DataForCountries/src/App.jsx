@@ -21,6 +21,7 @@ function App() {
   const [countries, setCountries] = useState([]); // Countries that are returned from the API
   const [selectedCountry, setSelectedCountry] = useState(""); //The country that is shown when there is only one country matching the search term
   const [weather, setWeather] = useState("");
+
   const api_key = import.meta.env.VITE_SOME_KEY; // API key to fetch weather API
   console.log("API key: " + api_key);
   useEffect(() => {
@@ -34,13 +35,16 @@ function App() {
       });
 
     // Always check the condition before fetch API or error will occur
-    if (selectedCountry) {
+    if (selectedCountry && selectedCountry.capital) {
       axios
         .get(
           `https://api.openweathermap.org/data/2.5/weather?q=${selectedCountry.capital}&appid=${api_key}&units=metric`
         )
         .then((response) => {
           setWeather(response.data);
+        })
+        .catch((error) => {
+          console.log(error);
         });
     }
   }, [api_key, selectedCountry]); // set the dependencies for effect if fetching API is dependent on it (e.g.selectedCountry is only returned after the search term is typed in)
@@ -52,7 +56,7 @@ function App() {
 
   // Filter countries based on the search term
   const filteredCountries = countries.filter((country) =>
-    country.name.common.toLowerCase().includes(searchTerm)
+    country.name.common.toLowerCase().includes(searchTerm.trim().toLowerCase())
   );
 
   // Display detailed information for a selected country
