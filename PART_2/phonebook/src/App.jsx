@@ -73,7 +73,7 @@ const App = () => {
         setPersons(initialPersons);
       })
       .catch((err) => {
-        console.err(err);
+        console.log(err);
       });
   }, []);
 
