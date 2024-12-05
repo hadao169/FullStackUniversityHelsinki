@@ -1,0 +1,23 @@
+sequenceDiagram
+    participant user
+    participant browser
+    participant server
+
+    user->>browser: Type something into the input field and then click "Save" button
+    browser->>server: POST https://studies.cs.helsinki.fi/exampleapp/new_note_spa
+    activate server
+    Note right of browser: Only one HTTP request to the address /new_note_app is sent to server (including the new note as JSON data containing both content of note and timestamp)
+    Note right of browser: Content-type header indicates that data is sent in JSON format
+
+
+    server-->>browser: Status code 201 Created
+    deactivate server
+    Note right of browser: The server responds with the status code 201 - successfully
+    Note right of browser: Browser does not redirect and not sent any further HTTP request.
+    Note right of browser: Browser will use the JS code fetched from the server to add new note and re-render node list
+
+    browser-->server: {content: "myNewNode", date: "2024-11-09T00:30:13.903Z"}  
+    Note right of browser: Browser sends new node to server in JSON format.
+
+
+
