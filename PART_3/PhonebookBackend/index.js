@@ -37,13 +37,30 @@ app.get("/info", (req, res) => {
   `);
 });
 
+const isDuplicate = (persons, newName) => {
+  return persons.some((person) => person.name === newName);
+};
+
 app.post("/api/persons", (req, res) => {
   let newID = Math.floor(Math.random() * 1000);
   const existingIDs = phonebookList.map((person) => person.id);
   while (existingIDs.includes(newID)) {
     newID = Math.floor(Math.random() * 1000);
   }
-  const newEntry = { id: newID.toString(), ...req.body };
+
+  const body = req.body;
+
+  if (!body.name || !body.number) {
+    return res.status(400).json({
+      error: "Name or number is missing",
+    });
+  } else if (isDuplicate(phonebookList, body.name)) {
+    return res.status(400).json({
+      error: "name must be unique",
+    });
+  }
+
+  const newEntry = { id: newID.toString(), ...body };
   phonebookList = [...phonebookList, newEntry];
   res.json(phonebookList);
 });
