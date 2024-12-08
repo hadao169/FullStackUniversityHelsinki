@@ -1,7 +1,11 @@
 import express from "express";
+import morgan from "morgan";
 const app = express();
 const port = 3001;
 app.use(express.json());
+app.use(
+  morgan(":method :url :status :res[content-length] - :response-time ms :body")
+);
 
 let phonebookList = [
   {
@@ -63,6 +67,10 @@ app.post("/api/persons", (req, res) => {
   const newEntry = { id: newID.toString(), ...body };
   phonebookList = [...phonebookList, newEntry];
   res.json(phonebookList);
+
+  morgan.token("body", (req, res) => {
+    return JSON.stringify(req.body);
+  });
 });
 
 app.get("/api/persons/:id", (req, res) => {
