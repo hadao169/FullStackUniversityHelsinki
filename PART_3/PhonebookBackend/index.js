@@ -1,8 +1,18 @@
 import express from "express";
 import morgan from "morgan";
+import cors from "cors";
+console.log(cors);
 const app = express();
-const port = 3001;
+
+// Enable JSON parsing and CORS
 app.use(express.json());
+app.use(cors());
+
+// Define morgan custom token
+morgan.token("body", (req, res) => {
+  return JSON.stringify(req.body);
+});
+// Use morgan with the custom token
 app.use(
   morgan(":method :url :status :res[content-length] - :response-time ms :body")
 );
@@ -67,10 +77,6 @@ app.post("/api/persons", (req, res) => {
   const newEntry = { id: newID.toString(), ...body };
   phonebookList = [...phonebookList, newEntry];
   res.json(phonebookList);
-
-  morgan.token("body", (req, res) => {
-    return JSON.stringify(req.body);
-  });
 });
 
 app.get("/api/persons/:id", (req, res) => {
@@ -95,6 +101,7 @@ app.delete("/api/persons/:id", (req, res) => {
   }
 });
 
-app.listen(port, () => {
-  console.log(`Server started on port ${port}`);
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
