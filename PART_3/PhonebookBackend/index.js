@@ -39,6 +39,7 @@ let phonebookList = [
     number: "39-23-6423122",
   },
 ];
+
 app.get("/api/persons", (req, res) => {
   res.json(phonebookList);
 });
@@ -76,6 +77,7 @@ app.post("/api/persons", (req, res) => {
 
   const newEntry = { id: newID.toString(), ...body };
   phonebookList = [...phonebookList, newEntry];
+  // console.log(phonebookList);
   res.json(phonebookList);
 });
 
