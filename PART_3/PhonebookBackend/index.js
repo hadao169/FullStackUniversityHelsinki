@@ -96,6 +96,27 @@ app.get("/api/persons/:id", (req, res) => {
     });
 });
 
+app.put("/api/persons/:id", (req, res, next) => {
+  const body = req.body;
+  const id = req.params.id;
+
+  const entry = {
+    name: body.name,
+    number: body.number,
+  };
+
+  Entry.findByIdAndUpdate(id, entry, { new: true })
+   .then((updatedEntry) => {
+      if (!updatedEntry) {
+        return res.status(404).send();
+      }
+      res.json(updatedEntry);
+    })
+   .catch((err) => {
+      next(err);
+    });
+});
+
 app.delete("/api/persons/:id", (req, res, next) => {
   Entry.findByIdAndDelete({ _id: req.params.id })
     .then((entry) => {
