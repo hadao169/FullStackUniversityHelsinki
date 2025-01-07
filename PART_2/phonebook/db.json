@@ -1,19 +1,14 @@
 {
   "persons": [
     {
-      "id": "6",
-      "name": "ha6",
-      "number": "12"
+      "id": "2",
+      "name": "Ha Dao",
+      "number": "53468909034"
     },
     {
       "id": "3",
-      "name": "ha1",
-      "number": "12"
-    },
-    {
-      "id": "2",
-      "name": "hadao",
-      "number": "234"
+      "name": "Alex Brewit",
+      "number": "215436457"
     }
   ]
 }

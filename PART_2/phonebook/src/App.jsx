@@ -51,12 +51,11 @@ const Filter = ({ searchTerm, onSearch }) => {
   );
 };
 
-const Notification = ({ message }) => {
-  if (message === null) {
+const Notification = ({ error, message }) => {
+  if (!message) {
     return null;
   }
-
-  return <div className="error">{message}</div>;
+  return <div className={error ? "error" : "notification"}>{message}</div>;
 };
 
 const App = () => {
@@ -65,6 +64,7 @@ const App = () => {
   const [newNumber, setNewNumber] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [message, setMessage] = useState("");
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     personService
@@ -158,8 +158,8 @@ const App = () => {
   };
 
   // => Should use 'some' method
-  // const isDuplicate = (personsList, name) => {
-  //   return personsList.some((person) => person.name === name);
+  // const isDuplicate = (persons, name) => {
+  //   return persons.some((person) => person.name === name);
   // };
 
   const handleDeleteContact = (id) => {
@@ -171,6 +171,14 @@ const App = () => {
         .then(() => {
           // Update state by filtering out the deleted contact
           setPersons(persons.filter((person) => person.id !== id));
+          setError(true);
+          setMessage(
+            `${contactRemoved.name} has been deleted from the server!`
+          );
+          setTimeout(() => {
+            setMessage("");
+            setError(false);
+          }, 4000);
         })
         .catch((err) => {
           console.error("Error deleting contact:", err);
@@ -186,7 +194,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification message={message} />
+      <Notification message={message} error={error} />
       <Filter searchTerm={searchTerm} onSearch={handleSearchNameChange} />
       <h2>Add a new</h2>
       <PersonForm
