@@ -20,11 +20,31 @@ app.use(
   morgan(":method :url :status :res[content-length] - :response-time ms :body")
 );
 
+// const unknownEndpoint = (request, response) => {
+//   response.status(404).send({ error: "unknown endpoint" });
+// };
+// // handler of requests with unknown endpoint
+// app.use(unknownEndpoint);
+
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message);
+
+  if (error.name === "CastError") {
+    return response.status(400).send({ error: "malformatted id" });
+  }
+
+  next(error);
+};
+// handler of requests with result to errors
+app.use(errorHandler);
+
 // Routes
-app.get("/api/persons", (req, res) => {
-  Entry.find({}).then((phonebooks) => {
-    res.json(phonebooks);
-  });
+app.get("/api/persons", (req, res, next) => {
+  Entry.find({})
+    .then((phonebooks) => {
+      res.json(phonebooks);
+    })
+    .catch((error) => next(error));
 });
 
 app.get("/info", (req, res) => {
@@ -76,11 +96,14 @@ app.get("/api/persons/:id", (req, res) => {
     });
 });
 
-app.delete("/api/persons/:id", (req, res) => {
-  const deletedID = req.params.id;
-  Entry.deleteOne({ id: deletedID }).then((entry) => {
-    res.json(entry);
-  });
+app.delete("/api/persons/:id", (req, res, next) => {
+  Entry.findByIdAndDelete({ _id: req.params.id })
+    .then((entry) => {
+      res.status(204).json(entry);
+    })
+    .catch((err) => {
+      next(err);
+    });
 });
 
 const PORT = process.env.PORT;
