@@ -106,13 +106,13 @@ app.put("/api/persons/:id", (req, res, next) => {
   };
 
   Entry.findByIdAndUpdate(id, entry, { new: true })
-   .then((updatedEntry) => {
+    .then((updatedEntry) => {
       if (!updatedEntry) {
         return res.status(404).send();
       }
       res.json(updatedEntry);
     })
-   .catch((err) => {
+    .catch((err) => {
       next(err);
     });
 });
