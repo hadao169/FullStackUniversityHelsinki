@@ -12,9 +12,10 @@ mongoose
     console.err("connection failed ", err.message);
   });
 
+// entryScheme is a document which is an instance of 
 const entryScheme = new mongoose.Schema({
-  name: String,
-  number: String,
+  name: { type: String, minLength: 3, required: true },
+  number: { type: String, required: true },
 });
 
 entryScheme.set("toJSON", {

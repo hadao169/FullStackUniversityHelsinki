@@ -74,6 +74,8 @@ const App = () => {
       })
       .catch((err) => {
         console.log(err);
+        setError(true);
+        setMessage(err.message);
       });
   }, []);
 
@@ -111,7 +113,9 @@ const App = () => {
           setNewNumber("");
         })
         .catch((err) => {
-          console.log("Errors occurred", err);
+          console.log("Errors occurred", err.message);
+          setError(true);
+          setMessage(err.response.data.error);
         });
     } else {
       const changedPerson = persons.find((person) => person.name === newName);
@@ -142,6 +146,8 @@ const App = () => {
             })
             .catch((err) => {
               console.log("Errors occurred", err);
+              setError(true);
+              setMessage(err.message);
             });
         }
       }
@@ -182,6 +188,7 @@ const App = () => {
         })
         .catch((err) => {
           console.error("Error deleting contact:", err);
+          setMessage(err.message);
         });
     }
   };
