@@ -204,7 +204,7 @@ const App = () => {
         onNumberChange={handlePhoneNumberChange}
         onAddName={handleAddName}
       />
-      <h2>Numbers</h2>
+      <h2>Number</h2>
       <Persons persons={filteredPersons} onDelete={handleDeleteContact} />
     </div>
   );
