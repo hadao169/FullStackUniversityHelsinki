@@ -108,7 +108,7 @@ const App = () => {
           setMessage(`Added ${newContact.name}`);
           setTimeout(() => {
             setMessage("");
-          }, 4000);
+          }, 3000);
           setNewName("");
           setNewNumber("");
         })
@@ -116,6 +116,10 @@ const App = () => {
           console.log("Errors occurred", err.message);
           setError(true);
           setMessage(err.response.data.error);
+          setTimeout(() => {
+            setMessage("");
+            setError(false);
+          }, 3000);
         });
     } else {
       const changedPerson = persons.find((person) => person.name === newName);
@@ -135,12 +139,13 @@ const App = () => {
                   person.id !== returnedContact.id ? person : returnedContact
                 )
               );
+
               setMessage(
                 `${updatedPerson.name}'s phonenumber has been changed!`
               );
               setTimeout(() => {
                 setMessage("");
-              }, 4000);
+              }, 3000);
               setNewName("");
               setNewNumber("");
             })
@@ -148,6 +153,10 @@ const App = () => {
               console.log("Errors occurred", err);
               setError(true);
               setMessage(err.message);
+              setTimeout(() => {
+                setMessage("");
+                setError(false);
+              }, 3000);
             });
         }
       }
@@ -184,11 +193,15 @@ const App = () => {
           setTimeout(() => {
             setMessage("");
             setError(false);
-          }, 4000);
+          }, 3000);
         })
         .catch((err) => {
-          console.error("Error deleting contact:", err);
+          console.log("Error deleting contact:", err);
+          setError(true);
           setMessage(err.message);
+          setTimeout(() => {
+            setMessage("");
+          }, 3000);
         });
     }
   };
