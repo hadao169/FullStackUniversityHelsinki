@@ -60,11 +60,13 @@ app.get("/info", (req, res) => {
 });
 
 const isDuplicate = (persons, newName) => {
-  return persons.some((person) => person.name === newName);
+  return persons.some(
+    (person) => person.name.toLowerCase() === newName.toLowerCase()
+  );
 };
 
 const generateId = () => {
-  const maxId = notes.length > 0 ? Math.max(...notes.map((n) => n.id)) : 0;
+  const maxId = persons.length > 0 ? Math.max(...persons.map((n) => n.id)) : 0;
   return maxId + 1;
 };
 
