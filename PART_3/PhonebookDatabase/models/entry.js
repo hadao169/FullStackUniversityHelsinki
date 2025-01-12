@@ -14,7 +14,6 @@ mongoose
     console.error("connection failed ", err.message);
   });
 
-// Define the schema
 const entryScheme = new mongoose.Schema({
   name: { type: String, minLength: 3, required: true },
   number: {
