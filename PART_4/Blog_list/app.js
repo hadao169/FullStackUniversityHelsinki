@@ -8,7 +8,7 @@ import {
   unknownEndpoint,
   errorHandler,
 } from "./utils/middleware.js";
-import { info, error } from "./utils/logger.js";
+import { info, errors } from "./utils/logger.js";
 import blogRouter from "./controllers/blogController.js";
 import morgan from "morgan";
 
@@ -22,7 +22,7 @@ mongoose
     info("connected to MongoDB");
   })
   .catch((error) => {
-    error("error connecting to MongoDB:", error.message);
+    errors("error connecting to MongoDB:", error.message);
   });
 
 // Enable JSON parsing and CORS
