@@ -56,7 +56,7 @@ const blogs = [
     url: "http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html",
     likes: 2,
     __v: 0,
-  }
+  },
 ];
 
 const favoriteBlog = (blogs) => {
@@ -116,6 +116,27 @@ const mostBlogs = (blogs) => {
   return mostBlogAuthor;
 };
 
-console.log(mostBlogs(blogs));
+const mostLikes = (blogs) => {
+  const mostLikeAuthor = {
+    author: "",
+    likes: 0,
+  };
 
-export { dummy, totalLikes, favoriteBlog, mostBlogs };
+  const likeCount = blogs.reduce((counts, blog) => {
+    counts[blog.author] = (counts[blog.author] || 0) + blog.likes; // Count blogs per author
+    return counts;
+  }, {});
+
+  for (const [author, likes] of Object.entries(likeCount)) {
+    if (likes > mostLikeAuthor.likes) {
+      mostLikeAuthor.author = author;
+      mostLikeAuthor.likes = likes;
+    }
+  }
+  return mostLikeAuthor;
+};
+
+console.log(mostBlogs(blogs));
+console.log(mostLikes(blogs));
+
+export { dummy, totalLikes, favoriteBlog, mostBlogs, mostLikes };
