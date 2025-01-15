@@ -56,7 +56,7 @@ const blogs = [
     url: "http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html",
     likes: 2,
     __v: 0,
-  },
+  }
 ];
 
 const favoriteBlog = (blogs) => {
@@ -78,6 +78,44 @@ const favoriteBlog = (blogs) => {
   return mostLikeBlog;
 };
 
-console.log("hello: ", favoriteBlog(blogs));
+const mostBlogs = (blogs) => {
+  const mostBlogAuthor = {
+    author: "",
+    blogs: 0,
+  };
 
-export { dummy, totalLikes, favoriteBlog };
+  // group blog by author name
+  const blogByName = blogs.reduce((authors, blog) => {
+    authors[blog.author] = authors[blog.author] || [];
+    authors[blog.author].push(blog);
+    return authors;
+  }, {});
+  console.log(blogByName);
+
+  //Second approach to group is using groupBy method of "Lodash" library
+  //Third approach: directly count blogs per author and save to a object whose key and value are author and numOfBlog
+  // const blogCount = blogs.reduce((counts, blog) => {
+  //   counts[blog.author] = (counts[blog.author] || 0) + 1; // Count blogs per author
+  //   return counts;
+  // }, {});
+
+  // find the author who has the most blogs
+  for (const [author, blog] of Object.entries(blogByName)) {
+    if (blog.length > mostBlogAuthor.blogs) {
+      mostBlogAuthor.author = author;
+      mostBlogAuthor.blogs = blog.length;
+    }
+  }
+
+  // for (const author in blogByName) {
+  //   if (blogByName[author].length > mostBlogAuthor.blogs) {
+  //     mostBlogAuthor.author = author;
+  //     mostBlogAuthor.blogs = blogByName[author].length;
+  //   }
+  // }
+  return mostBlogAuthor;
+};
+
+console.log(mostBlogs(blogs));
+
+export { dummy, totalLikes, favoriteBlog, mostBlogs };
