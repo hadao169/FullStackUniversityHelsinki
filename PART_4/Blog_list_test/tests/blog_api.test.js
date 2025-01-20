@@ -26,6 +26,28 @@ test("valid ID", async () => {
   });
 });
 
+test.only("created successfully", async () => {
+  const newPost = {
+    title: "MR world",
+    author: "bin gates",
+    url: "https://www.youtube.com/watch?v=Cq3ebyAou30",
+    likes: 100,
+  };
+
+  // Get the initial number of blogs
+  const initialLength = (await api.get("/api/blogs")).body.length;
+  await api.post("/api/blogs").send(newPost).expect(201);
+
+  const updatedRes = await api.get("/api/blogs");
+  const updatedLength = updatedRes.body.length;
+
+  const title = updatedRes.body.map((r) => r.title);
+
+  assert.strictEqual(updatedLength, initialLength + 1);
+
+  assert(title.includes("MR world"));
+});
+
 after(async () => {
   await mongoose.connection.close();
 });
