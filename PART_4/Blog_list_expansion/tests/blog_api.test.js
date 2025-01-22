@@ -1,10 +1,17 @@
-import { test, after, describe } from "node:test";
+import { test, after, beforeEach } from "node:test";
 import mongoose from "mongoose";
 import supertest from "supertest";
 import app from "../app.js";
 import assert from "assert";
+import * as helper from "./test_helper.js";
+import Blog from "../models/blogSchema.js";
 
 const api = supertest(app);
+
+beforeEach(async () => {
+  await Blog.deleteMany({}); // delete all the databases
+  await Blog.insertMany(helper.initialBlogs);
+});
 
 test("blogs are returned as json", async () => {
   await api
@@ -15,7 +22,7 @@ test("blogs are returned as json", async () => {
 
 test("Enough blogs are returned", async () => {
   const res = await api.get("/api/blogs");
-  assert.strictEqual(res.body.length, 3);
+  assert.strictEqual(res.body.length, 2);
 });
 
 test("valid ID", async () => {
@@ -26,7 +33,7 @@ test("valid ID", async () => {
   });
 });
 
-test.only("created successfully", async () => {
+test("created successfully", async () => {
   const newPost = {
     title: "MR world",
     author: "bin gates",
@@ -48,7 +55,7 @@ test.only("created successfully", async () => {
   assert(title.includes("MR world"));
 });
 
-test.only("likes property defaults to 0 if missing", async () => {
+test("likes property defaults to 0 if missing", async () => {
   const newPost = {
     title: "MR world",
     author: "bin gates",
@@ -59,7 +66,7 @@ test.only("likes property defaults to 0 if missing", async () => {
   assert.strictEqual(res.body.likes, 0);
 });
 
-test.only("400 Bad Request if title is missing", async () => {
+test("400 Bad Request if title is missing", async () => {
   const newBlog = {
     url: "http://example.com",
     author: "John Doe",
@@ -70,7 +77,7 @@ test.only("400 Bad Request if title is missing", async () => {
   assert(res.body.error.includes("url or title is missing"));
 });
 
-test.only("400 Bad Request if url is missing", async () => {
+test("400 Bad Request if url is missing", async () => {
   const newBlog = {
     title: "Test Blog",
     author: "John Doe",
@@ -78,9 +85,29 @@ test.only("400 Bad Request if url is missing", async () => {
   };
 
   const res = await api.post("/api/blogs").send(newBlog).expect(400);
-  console.log(res.body);
   assert(res.body.error.includes("url or title is missing"));
   // expect(res.body.error).toBeDefined();
+});
+
+test("deleted successfully with status code 204", async () => {
+  const res = await api.get("/api/blogs");
+  const deletedBlog = res.body[0];
+
+  await api.delete(`/api/blogs/${deletedBlog.id}`).expect(204);
+
+  const updatedBlogs = await api.get("/api/blogs");
+  assert.strictEqual(updatedBlogs.body.length, res.body.length - 1);
+});
+
+test("updated successfully with status code 200", async () => {
+  const blogsAtStart = await helper.blogsInDb();
+  let blogToUpdate = blogsAtStart[0];
+  const updatedBlog = { ...blogToUpdate, likes: 203 };
+
+  await api.put(`/api/blogs/${blogToUpdate.id}`).send(updatedBlog).expect(200);
+
+  const updatedBlogs = await api.get("/api/blogs");
+  assert.strictEqual(updatedBlogs.body[0].likes, 203);
 });
 
 after(async () => {
