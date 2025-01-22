@@ -70,7 +70,7 @@ test("400 Bad Request if title is missing", async () => {
   const newBlog = {
     url: "http://example.com",
     author: "John Doe",
-    likes: 10,
+    likes: 20,
   };
 
   const res = await api.post("/api/blogs").send(newBlog).expect(400);
