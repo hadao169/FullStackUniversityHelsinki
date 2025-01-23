@@ -1,4 +1,4 @@
-import express, { request, response } from "express";
+import express from "express";
 const blogRouter = express.Router();
 import Blog from "../models/blogSchema.js";
 import "express-async-errors";
