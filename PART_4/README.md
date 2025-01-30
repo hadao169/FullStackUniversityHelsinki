@@ -29,5 +29,10 @@ But Promise.all executes promises it receives in parallel => if we want to execu
 
 # Token authentication jwt library
 
-# Difference between authentication and authorization
-# Authentication: 
+# Difference between authentication and authorization:
+
+    Authentication: verify if the users are who they actually are
+    Authorization: verify what they have access to
+
+# Server-side session: the session data is stored and managed on the server.
+    Drawback: increased complexity in the backend and effect on performance because token validity need checking for each API request to the database which takes more time than checking validity of the token itself.
