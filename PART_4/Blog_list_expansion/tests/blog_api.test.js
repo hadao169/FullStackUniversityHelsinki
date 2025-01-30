@@ -1,10 +1,12 @@
-import { test, after, beforeEach } from "node:test";
+import { test, after, beforeEach, describe } from "node:test";
 import mongoose from "mongoose";
 import supertest from "supertest";
 import app from "../app.js";
 import assert from "assert";
 import * as helper from "./test_helper.js";
 import Blog from "../models/blogSchema.js";
+import bcrypt from "bcrypt";
+import User from "../models/userSchema.js";
 
 const api = supertest(app);
 
@@ -110,6 +112,40 @@ test("updated successfully with status code 200", async () => {
   assert.strictEqual(updatedBlogs.body[0].likes, 203);
 });
 
+describe("when there is initially one user in db", () => {
+  beforeEach(async () => {
+    await User.deleteMany({});
+
+    const passwordHash = await bcrypt.hash("sekret", 10);
+    const user = new User({ username: "root", passwordHash });
+
+    await user.save();
+  });
+
+  test("creation succeeds with a fresh username", async () => {
+    const usersAtStart = await helper.usersInDb();
+
+    const newUser = {
+      username: "hadao",
+      name: "Ha Dao",
+      password: "helloworld",
+    };
+
+    await api
+      .post("/api/users/")
+      .send(newUser)
+      .expect(201)
+      .expect("Content-Type", /application\/json/);
+
+    const usersAtEnd = await helper.usersInDb();
+    assert.strictEqual(usersAtEnd.length, usersAtStart.length + 1);
+
+    const usernames = usersAtEnd.map((u) => u.username);
+    assert(usernames.includes(newUser.username));
+  });
+});
+
 after(async () => {
+  await User.deleteMany({});
   await mongoose.connection.close();
 });

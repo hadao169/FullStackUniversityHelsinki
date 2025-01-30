@@ -10,7 +10,9 @@ import {
 } from "./utils/middleware.js";
 import { info, errors } from "./utils/logger.js";
 import blogRouter from "./controllers/blogController.js";
+import userRouter from "./controllers/userController.js";
 import morgan from "morgan";
+import loginRouter from "./controllers/loginController.js";
 
 mongoose.set("strictQuery", false);
 
@@ -39,5 +41,7 @@ app.use(
 );
 
 app.use("/api/blogs", blogRouter);
+app.use("/api/users", userRouter);
+app.use("/api/login", loginRouter);
 
 export default app;

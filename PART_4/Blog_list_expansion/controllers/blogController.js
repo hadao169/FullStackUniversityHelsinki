@@ -1,22 +1,48 @@
 import express from "express";
 const blogRouter = express.Router();
 import Blog from "../models/blogSchema.js";
+import User from "../models/userSchema.js";
 import "express-async-errors";
+import jwt from "jsonwebtoken";
 
 blogRouter.get("/", async (request, response) => {
-  const blogs = await Blog.find({});
+  const blogs = await Blog.find({}).populate("user");
   response.json(blogs);
 });
+
+//
+const getTokenFrom = (request) => {
+  const authorization = request.get("authorization");
+  if (authorization && authorization.startsWith("Bearer ")) {
+    return authorization.replace("Bearer ", "");
+  }
+  return null;
+};
 
 blogRouter.post("/", async (request, response, next) => {
   const newBlog = new Blog(request.body);
 
+  const decodedToken = jwt.verify(getTokenFrom(request), process.env.SECRET);
+  console.log("hello: ", decodedToken);
+
+  if (!decodedToken.id) {
+    return response.status(401).json({ error: "token invalid" });
+  }
+
+  const user = await User.findById(decodedToken.id);
+  console.log(user);
+  
+  // const user = await User.findById(newBlog.user);
+  console.log(user);
   if (!newBlog.title || !newBlog.url) {
     response.status(400).json({
       error: "url or title is missing",
     });
   } else {
+    newBlog.user = user.id;
     const savedBlog = await newBlog.save();
+    user.blogs = user.blogs.concat(savedBlog.id);
+    await user.save();
     response.status(201).json(savedBlog);
   }
 });
@@ -36,7 +62,7 @@ blogRouter.put("/:id", async (request, response) => {
   const blog = await Blog.findByIdAndUpdate(request.params.id, updatedBlog, {
     new: true,
   });
-  
+
   response.json(blog);
 });
 
