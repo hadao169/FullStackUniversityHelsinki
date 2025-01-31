@@ -28,9 +28,10 @@ mongoose
   });
 
 // Enable JSON parsing and CORS
-app.use(express.json());
 app.use(express.static("dist"));
 app.use(cors());
+app.use(express.json());
+app.use(requestLogger);
 // Define morgan custom token
 morgan.token("body", (req, res) => {
   return JSON.stringify(req.body);
@@ -43,5 +44,8 @@ app.use(
 app.use("/api/blogs", blogRouter);
 app.use("/api/users", userRouter);
 app.use("/api/login", loginRouter);
+
+app.use(unknownEndpoint);
+app.use(errorHandler);
 
 export default app;

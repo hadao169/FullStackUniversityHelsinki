@@ -10,8 +10,20 @@ import User from "../models/userSchema.js";
 
 const api = supertest(app);
 
+// Global variable for the user
+let user;
+
 beforeEach(async () => {
-  await Blog.deleteMany({}); // delete all the databases
+  // Create a user before all tests
+  await User.deleteMany({});
+
+  const passwordHash = await bcrypt.hash("sekret", 10);
+  user = new User({ username: "root", passwordHash });
+  await user.save();
+});
+
+beforeEach(async () => {
+  await Blog.deleteMany({}); // delete all the blogs
   await Blog.insertMany(helper.initialBlogs);
 });
 
@@ -41,6 +53,7 @@ test("created successfully", async () => {
     author: "bin gates",
     url: "https://www.youtube.com/watch?v=Cq3ebyAou30",
     likes: 100,
+    user: user._id, // Using the global user
   };
 
   // Get the initial number of blogs
@@ -53,7 +66,6 @@ test("created successfully", async () => {
   const title = updatedRes.body.map((r) => r.title);
 
   assert.strictEqual(updatedLength, initialLength + 1);
-
   assert(title.includes("MR world"));
 });
 
@@ -62,6 +74,7 @@ test("likes property defaults to 0 if missing", async () => {
     title: "MR world",
     author: "bin gates",
     url: "https://www.youtube.com/watch?v=Cq3ebyAou30",
+    user: user._id, // Using the global user
   };
 
   const res = await api.post("/api/blogs").send(newPost).expect(201);
@@ -73,6 +86,7 @@ test("400 Bad Request if title is missing", async () => {
     url: "http://example.com",
     author: "John Doe",
     likes: 20,
+    user: user._id, // Using the global user
   };
 
   const res = await api.post("/api/blogs").send(newBlog).expect(400);
@@ -84,11 +98,11 @@ test("400 Bad Request if url is missing", async () => {
     title: "Test Blog",
     author: "John Doe",
     likes: 10,
+    user: user._id, // Using the global user
   };
 
   const res = await api.post("/api/blogs").send(newBlog).expect(400);
   assert(res.body.error.includes("url or title is missing"));
-  // expect(res.body.error).toBeDefined();
 });
 
 test("deleted successfully with status code 204", async () => {
@@ -112,16 +126,8 @@ test("updated successfully with status code 200", async () => {
   assert.strictEqual(updatedBlogs.body[0].likes, 203);
 });
 
+// User tests
 describe("when there is initially one user in db", () => {
-  beforeEach(async () => {
-    await User.deleteMany({});
-
-    const passwordHash = await bcrypt.hash("sekret", 10);
-    const user = new User({ username: "root", passwordHash });
-
-    await user.save();
-  });
-
   test("creation succeeds with a fresh username", async () => {
     const usersAtStart = await helper.usersInDb();
 
@@ -132,7 +138,7 @@ describe("when there is initially one user in db", () => {
     };
 
     await api
-      .post("/api/users/")
+      .post("/api/users/") // Create a new user
       .send(newUser)
       .expect(201)
       .expect("Content-Type", /application\/json/);
@@ -143,9 +149,36 @@ describe("when there is initially one user in db", () => {
     const usernames = usersAtEnd.map((u) => u.username);
     assert(usernames.includes(newUser.username));
   });
+
+  test("invalid users are not created", async () => {
+    const newUser = {
+      username: "ha",
+      name: "Ha Dao",
+      password: "helloworld",
+    };
+
+    const res = await api.post("/api/users/").send(newUser).expect(400);
+    assert(
+      res.body.error.includes(
+        "User validation failed: username: Path `username` (`ha`) is shorter than the minimum allowed length (3)."
+      )
+    );
+  });
+
+  test("should return 400 if username is missing", async () => {
+    const newUser = {
+      name: "Ha Dao",
+      password: "21232",
+    };
+
+    const response = await api.post("/api/users").send(newUser);
+
+    assert.strictEqual(response.status, 400);
+    assert(response.body.error.includes("username or password is not given!"));
+  });
 });
 
 after(async () => {
-  await User.deleteMany({});
+  // Close the mongoose connection after tests
   await mongoose.connection.close();
 });
