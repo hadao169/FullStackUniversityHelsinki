@@ -46,7 +46,7 @@ app.use(
 app.use(tokenExtractor);
 
 // Only be executed with the path /api/blogs routes or with a specific operation of a route
-app.use("/api/blogs", userExtractor, blogRouter);
+app.use("/api/blogs", blogRouter);
 app.use("/api/users", userRouter);
 app.use("/api/login", loginRouter);
 

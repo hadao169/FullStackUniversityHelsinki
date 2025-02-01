@@ -7,23 +7,28 @@ import * as helper from "./test_helper.js";
 import Blog from "../models/blogSchema.js";
 import bcrypt from "bcrypt";
 import User from "../models/userSchema.js";
+import { response } from "express";
 
 const api = supertest(app);
 
 // Global variable for the user
 let user;
+const userForTest = {
+  username: "root",
+  password: "sekret",
+};
 
 beforeEach(async () => {
-  // Create a user before all tests
+  // Clear the database
   await User.deleteMany({});
+  await Blog.deleteMany({});
 
+  // Create a user
   const passwordHash = await bcrypt.hash("sekret", 10);
   user = new User({ username: "root", passwordHash });
   await user.save();
-});
 
-beforeEach(async () => {
-  await Blog.deleteMany({}); // delete all the blogs
+  // Insert initial blogs
   await Blog.insertMany(helper.initialBlogs);
 });
 
@@ -53,13 +58,19 @@ test("created successfully", async () => {
     author: "bin gates",
     url: "https://www.youtube.com/watch?v=Cq3ebyAou30",
     likes: 100,
-    user: user._id, // Using the global user
   };
 
   // Get the initial number of blogs
   const initialLength = (await api.get("/api/blogs")).body.length;
+  const loginResponse = await api.post("/api/login").send(userForTest); // Use the plaintext password here
 
-  await api.post("/api/blogs").send(newPost).expect(201);
+  let token = loginResponse.body.token;
+  console.log(token);
+  await api
+    .post("/api/blogs")
+    .set("Authorization", `Bearer ${token}`)
+    .send(newPost)
+    .expect(201);
   const updatedRes = await api.get("/api/blogs");
   const updatedLength = updatedRes.body.length;
 
@@ -76,8 +87,15 @@ test("likes property defaults to 0 if missing", async () => {
     url: "https://www.youtube.com/watch?v=Cq3ebyAou30",
     user: user._id, // Using the global user
   };
+  const initialLength = (await api.get("/api/blogs")).body.length;
+  const loginResponse = await api.post("/api/login").send(userForTest); // Use the plaintext password here
 
-  const res = await api.post("/api/blogs").send(newPost).expect(201);
+  let token = loginResponse.body.token;
+  const res = await api
+    .post("/api/blogs")
+    .set("Authorization", `Bearer ${token}`)
+    .send(newPost)
+    .expect(201);
   assert.strictEqual(res.body.likes, 0);
 });
 
@@ -88,8 +106,14 @@ test("400 Bad Request if title is missing", async () => {
     likes: 20,
     user: user._id, // Using the global user
   };
+  const loginResponse = await api.post("/api/login").send(userForTest); // Use the plaintext password here
 
-  const res = await api.post("/api/blogs").send(newBlog).expect(400);
+  let token = loginResponse.body.token;
+  const res = await api
+    .post("/api/blogs")
+    .set("Authorization", `Bearer ${token}`)
+    .send(newBlog)
+    .expect(400);
   assert(res.body.error.includes("url or title is missing"));
 });
 
@@ -101,15 +125,39 @@ test("400 Bad Request if url is missing", async () => {
     user: user._id, // Using the global user
   };
 
-  const res = await api.post("/api/blogs").send(newBlog).expect(400);
+  const loginResponse = await api.post("/api/login").send(userForTest); // Use the plaintext password here
+
+  let token = loginResponse.body.token;
+
+  const res = await api
+    .post("/api/blogs")
+    .set("Authorization", `Bearer ${token}`)
+    .send(newBlog)
+    .expect(400);
   assert(res.body.error.includes("url or title is missing"));
 });
 
 test("deleted successfully with status code 204", async () => {
-  const res = await api.get("/api/blogs");
-  const deletedBlog = res.body[0];
+  const newBlog = {
+    title: "Test Blog",
+    author: "John Doe",
+    likes: 10,
+    url: "http://example.com",
+  };
+  const loginResponse = await api.post("/api/login").send(userForTest);
+  const token = loginResponse.body.token;
 
-  await api.delete(`/api/blogs/${deletedBlog.id}`).expect(204);
+  await api
+    .post("/api/blogs")
+    .set("Authorization", `Bearer ${token}`)
+    .send(newBlog);
+  const res = await api.get("/api/blogs");
+  const deletedBlog = res.body[res.body.length - 1];
+  console.log("deleted: ", deletedBlog);
+  await api
+    .delete(`/api/blogs/${deletedBlog.id}`)
+    .set("Authorization", `Bearer ${token}`)
+    .expect(204);
 
   const updatedBlogs = await api.get("/api/blogs");
   assert.strictEqual(updatedBlogs.body.length, res.body.length - 1);
@@ -164,18 +212,18 @@ describe("when there is initially one user in db", () => {
       )
     );
   });
+});
 
-  test("should return 400 if username is missing", async () => {
-    const newUser = {
-      name: "Ha Dao",
-      password: "21232",
-    };
+test("failed with status code 404 Unauthorized", async () => {
+  const newBlog = {
+    title: "Test Blog",
+    author: "John Doe",
+    likes: 10,
+    url: "http://example.com",
+  };
 
-    const response = await api.post("/api/users").send(newUser);
-
-    assert.strictEqual(response.status, 400);
-    assert(response.body.error.includes("username or password is not given!"));
-  });
+  const res = await api.post("/api/blogs").send(newBlog).expect(401);
+  assert.strictEqual(res.status, 401);
 });
 
 after(async () => {

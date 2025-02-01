@@ -3,13 +3,14 @@ const blogRouter = express.Router();
 import Blog from "../models/blogSchema.js";
 import User from "../models/userSchema.js";
 import "express-async-errors";
+import { userExtractor } from "../utils/middleware.js";
 
 blogRouter.get("/", async (request, response) => {
   const blogs = await Blog.find({}).populate("user", " -blogs");
   response.json(blogs);
 });
 
-blogRouter.post("/", async (request, response, next) => {
+blogRouter.post("/", userExtractor, async (request, response, next) => {
   const newBlog = new Blog(request.body);
 
   const user = request.user;
@@ -28,7 +29,7 @@ blogRouter.post("/", async (request, response, next) => {
   }
 });
 
-blogRouter.delete("/:id", async (request, response, next) => {
+blogRouter.delete("/:id", userExtractor, async (request, response, next) => {
   const id = request.params.id;
   const user = request.user;
   const blog = await Blog.findById(id);
