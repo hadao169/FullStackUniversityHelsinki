@@ -8,6 +8,7 @@ import {
   unknownEndpoint,
   errorHandler,
   tokenExtractor,
+  userExtractor,
 } from "./utils/middleware.js";
 import { info, errors } from "./utils/logger.js";
 import blogRouter from "./controllers/blogController.js";
@@ -43,7 +44,9 @@ app.use(
 );
 
 app.use(tokenExtractor);
-app.use("/api/blogs", blogRouter);
+
+// Only be executed with the path /api/blogs routes or with a specific operation of a route
+app.use("/api/blogs", userExtractor, blogRouter);
 app.use("/api/users", userRouter);
 app.use("/api/login", loginRouter);
 

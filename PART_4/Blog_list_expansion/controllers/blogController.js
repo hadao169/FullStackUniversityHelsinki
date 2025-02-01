@@ -3,7 +3,6 @@ const blogRouter = express.Router();
 import Blog from "../models/blogSchema.js";
 import User from "../models/userSchema.js";
 import "express-async-errors";
-import jwt from "jsonwebtoken";
 
 blogRouter.get("/", async (request, response) => {
   const blogs = await Blog.find({}).populate("user", " -blogs");
@@ -13,14 +12,7 @@ blogRouter.get("/", async (request, response) => {
 blogRouter.post("/", async (request, response, next) => {
   const newBlog = new Blog(request.body);
 
-  const decodedToken = jwt.verify(request.token, process.env.SECRET);
-  console.log("hello: ", decodedToken);
-
-  if (!decodedToken.id) {
-    return response.status(401).json({ error: "token invalid" });
-  }
-
-  const user = await User.findById(decodedToken.id);
+  const user = request.user;
 
   // console.log("user: ", user);
   if (!newBlog.title || !newBlog.url) {
@@ -38,14 +30,7 @@ blogRouter.post("/", async (request, response, next) => {
 
 blogRouter.delete("/:id", async (request, response, next) => {
   const id = request.params.id;
-
-  const decodedToken = jwt.verify(request.token, process.env.SECRET);
-  console.log("hello: ", decodedToken);
-
-  if (!decodedToken.id) {
-    return response.status(401).json({ error: "token invalid" });
-  }
-  const user = await User.findById(decodedToken.id);
+  const user = request.user;
   const blog = await Blog.findById(id);
 
   if (blog.user.toString() === user.id.toString()) {

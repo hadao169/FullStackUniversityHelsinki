@@ -1,4 +1,6 @@
 import { info, errors } from "./logger.js";
+import jwt from "jsonwebtoken";
+import User from "../models/userSchema.js";
 
 const requestLogger = (request, response, next) => {
   info("Method:", request.method);
@@ -36,6 +38,7 @@ const errorHandler = (error, request, response, next) => {
 // Take the token from the header => delete the first string "Bearer" => add a property called "token" to req object => To get the token, call "request.token"
 const tokenExtractor = (request, response, next) => {
   const authorization = request.get("authorization");
+  // console.log("auth: ", authorization);
   if (authorization && authorization.startsWith("Bearer ")) {
     request.token = authorization.replace("Bearer ", "");
     // console.log(request.token);
@@ -43,4 +46,22 @@ const tokenExtractor = (request, response, next) => {
   next();
 };
 
-export { requestLogger, unknownEndpoint, errorHandler, tokenExtractor };
+const userExtractor = async (request, response, next) => {
+  const decodedToken = jwt.verify(request.token, process.env.SECRET);
+  console.log("hello: ", decodedToken);
+
+  if (!decodedToken.id) {
+    return response.status(401).json({ error: "token invalid" });
+  }
+
+  request.user = await User.findById(decodedToken.id);
+  next();
+};
+
+export {
+  requestLogger,
+  unknownEndpoint,
+  errorHandler,
+  tokenExtractor,
+  userExtractor,
+};
