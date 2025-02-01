@@ -6,23 +6,14 @@ import "express-async-errors";
 import jwt from "jsonwebtoken";
 
 blogRouter.get("/", async (request, response) => {
-  const blogs = await Blog.find({}).populate("user"," -blogs");
+  const blogs = await Blog.find({}).populate("user", " -blogs");
   response.json(blogs);
 });
-
-//
-const getTokenFrom = (request) => {
-  const authorization = request.get("authorization");
-  if (authorization && authorization.startsWith("Bearer ")) {
-    return authorization.replace("Bearer ", "");
-  }
-  return null;
-};
 
 blogRouter.post("/", async (request, response, next) => {
   const newBlog = new Blog(request.body);
 
-  const decodedToken = jwt.verify(getTokenFrom(request), process.env.SECRET);
+  const decodedToken = jwt.verify(request.token, process.env.SECRET);
   console.log("hello: ", decodedToken);
 
   if (!decodedToken.id) {
@@ -30,10 +21,8 @@ blogRouter.post("/", async (request, response, next) => {
   }
 
   const user = await User.findById(decodedToken.id);
-  console.log(user);
 
-
-  console.log("user: ", user);
+  // console.log("user: ", user);
   if (!newBlog.title || !newBlog.url) {
     response.status(400).json({
       error: "url or title is missing",

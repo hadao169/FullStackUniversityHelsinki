@@ -7,6 +7,7 @@ import {
   requestLogger,
   unknownEndpoint,
   errorHandler,
+  tokenExtractor,
 } from "./utils/middleware.js";
 import { info, errors } from "./utils/logger.js";
 import blogRouter from "./controllers/blogController.js";
@@ -41,6 +42,7 @@ app.use(
   morgan(":method :url :status :res[content-length] - :response-time ms :body")
 );
 
+app.use(tokenExtractor);
 app.use("/api/blogs", blogRouter);
 app.use("/api/users", userRouter);
 app.use("/api/login", loginRouter);

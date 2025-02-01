@@ -33,4 +33,14 @@ const errorHandler = (error, request, response, next) => {
   next(error);
 };
 
-export { requestLogger, unknownEndpoint, errorHandler };
+// Take the token from the header => delete the first string "Bearer" => add a property called "token" to req object => To get the token, call "request.token"
+const tokenExtractor = (request, response, next) => {
+  const authorization = request.get("authorization");
+  if (authorization && authorization.startsWith("Bearer ")) {
+    request.token = authorization.replace("Bearer ", "");
+    // console.log(request.token);
+  }
+  next();
+};
+
+export { requestLogger, unknownEndpoint, errorHandler, tokenExtractor };
