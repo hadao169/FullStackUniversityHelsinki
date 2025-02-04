@@ -17,10 +17,10 @@ const LoginSignUp = ({
       <h2>Enter your login credentials</h2>
       {isError === true ? <p className="errors">{errorMessage}</p> : null}
       <form className="sign-in-form" onSubmit={onSubmit}>
-        <label htmlFor="first">Username:</label>
+        <label htmlFor="username">Username:</label>
         <input
           type="text"
-          id="first"
+          id="username"
           name="first"
           placeholder="Enter your Username"
           required

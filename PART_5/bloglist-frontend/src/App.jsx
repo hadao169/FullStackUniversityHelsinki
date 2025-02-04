@@ -8,16 +8,16 @@ import "./index.css";
 //Import components
 import LoginSignUp from "./components/LoginSignUp";
 import Blog from "./components/Blog";
-// import User from "./components/User";
+import AddNewBlog from "./components/AddBlog";
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
-  const [errorMessage, setErrorMessage] = useState(null);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
   const [isError, setIsError] = useState(false);
   // const [isSignedIn, setIsSignedIn] = useState(false);
+  const [message, setMessage] = useState(null);
 
   useEffect(() => {
     blogService.getAll().then((blogs) => setBlogs(blogs));
@@ -51,16 +51,18 @@ const App = () => {
       console.log(user);
       window.localStorage.setItem("loggedBlogappUser", JSON.stringify(user));
       blogService.setToken(user.token);
-      // const blogsOfSpecificUser = user.filter;
       setUser(user);
-      // setIsSignedIn(true);
       setUsername("");
       setPassword("");
+
+      // // Fetch blogs again after login to get latest data
+      const updatedBlogs = await blogService.getAll();
+      setBlogs(updatedBlogs);
     } catch (exception) {
       setIsError(true);
-      setErrorMessage("wrong credentials");
+      setMessage("Username or password is incorrect!");
       setTimeout(() => {
-        setErrorMessage(null);
+        setMessage(null);
         setIsError(false);
       }, 3000);
     }
@@ -71,11 +73,36 @@ const App = () => {
     setUser(null);
   };
 
+  const handleAddBlog = async (blogObject) => {
+    try {
+      const newBlog = {
+        title: blogObject.title,
+        author: blogObject.author,
+        url: blogObject.url,
+      };
+
+      const returnedBlog = await blogService.create(newBlog);
+      const updatedBlogs = await blogService.getAll();
+      setBlogs(updatedBlogs);
+      setMessage(
+        `A new blog ${returnedBlog.title} by ${returnedBlog.author} added!`
+      );
+      setTimeout(() => {
+        setMessage(null);
+      }, 3000);
+    } catch (exception) {
+      setMessage("Error adding blog!");
+      setTimeout(() => {
+        setMessage(null);
+      }, 3000);
+    }
+  };
+
   if (user === null) {
     return (
       <LoginSignUp
         onSubmit={handleLogin}
-        errorMessage={errorMessage}
+        errorMessage={message}
         isError={isError}
         onUsername={handleUsername}
         onPassword={handlePassword}
@@ -86,9 +113,12 @@ const App = () => {
   return (
     <div className="main">
       <h2 className="heading">My blogs</h2>
-      <p className="user">{user.name} logged in!</p>
-      <button onClick={handleSignout}>Sign out</button>
+      <div className="user-info">
+        <p className="user">{user.name} logged in!</p>
+        <button onClick={handleSignout}>Sign out</button>
+      </div>
       <Blog blogs={blogs} user={user} />
+      <AddNewBlog onAdd={handleAddBlog} />
     </div>
   );
 };
