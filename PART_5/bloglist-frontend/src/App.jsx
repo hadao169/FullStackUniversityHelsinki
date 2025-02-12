@@ -1,5 +1,5 @@
 //Import libraries
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 //Import services
 import blogService from "./services/blogs";
 import loginService from "./services/login";
@@ -9,6 +9,7 @@ import "./index.css";
 import LoginSignUp from "./components/LoginSignUp";
 import Blog from "./components/Blog";
 import AddNewBlog from "./components/AddBlog";
+import Togglable from "./components/Togglable";
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
@@ -18,9 +19,14 @@ const App = () => {
   const [isError, setIsError] = useState(false);
   // const [isSignedIn, setIsSignedIn] = useState(false);
   const [message, setMessage] = useState(null);
+  const blogFormRef = useRef();
 
   useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs));
+    const fetchBlogs = async () => {
+      const blogs = await blogService.getAll();
+      setBlogs(blogs);
+    };
+    fetchBlogs();
   }, []);
 
   useEffect(() => {
@@ -55,7 +61,7 @@ const App = () => {
       setUsername("");
       setPassword("");
 
-      // // Fetch blogs again after login to get latest data
+      // Fetch blogs again after login to get latest data
       const updatedBlogs = await blogService.getAll();
       setBlogs(updatedBlogs);
     } catch (exception) {
@@ -64,7 +70,7 @@ const App = () => {
       setTimeout(() => {
         setMessage(null);
         setIsError(false);
-      }, 3000);
+      }, 2000);
     }
   };
 
@@ -74,6 +80,8 @@ const App = () => {
   };
 
   const handleAddBlog = async (blogObject) => {
+    blogFormRef.current.toggleVisibility();
+
     try {
       const newBlog = {
         title: blogObject.title,
@@ -82,6 +90,7 @@ const App = () => {
       };
 
       const returnedBlog = await blogService.create(newBlog);
+      console.log(returnedBlog);
       const updatedBlogs = await blogService.getAll();
       setBlogs(updatedBlogs);
       setMessage(
@@ -98,14 +107,37 @@ const App = () => {
     }
   };
 
+  const handleDeleteBlog = async (id) => {
+    const blogRemoved = blogs.find((blog) => blog.id === id);
+
+    if (window.confirm(`Delete ${blogRemoved.title}?`)) {
+      try {
+        await blogService.deletes(id);
+        setBlogs(blogs.filter((blog) => blog.id !== id));
+        setMessage(`${blogRemoved.title} has been deleted from the server!`);
+        setTimeout(() => {
+          setMessage(null);
+        }, 3000);
+      } catch (err) {
+        console.error("Error deleting blog:", err);
+        setMessage("Error deleting blog!");
+        setTimeout(() => {
+          setMessage(null);
+        }, 3000);
+      }
+    }
+  };
+
   if (user === null) {
     return (
       <LoginSignUp
         onSubmit={handleLogin}
         errorMessage={message}
         isError={isError}
-        onUsername={handleUsername}
-        onPassword={handlePassword}
+        onChangeUsername={handleUsername}
+        onChangePassword={handlePassword}
+        username={username}
+        password={password}
       />
     );
   }
@@ -113,12 +145,15 @@ const App = () => {
   return (
     <div className="main">
       <h2 className="heading">My blogs</h2>
+      {message ? <p className="message">{message}</p> : null}
       <div className="user-info">
         <p className="user">{user.name} logged in!</p>
         <button onClick={handleSignout}>Sign out</button>
       </div>
-      <Blog blogs={blogs} user={user} />
-      <AddNewBlog onAdd={handleAddBlog} />
+      <Togglable buttonLabel="Create" ref={blogFormRef}>
+        <AddNewBlog onAdd={handleAddBlog} />
+      </Togglable>
+      <Blog blogs={blogs} user={user} onRemove={handleDeleteBlog} />
     </div>
   );
 };

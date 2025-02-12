@@ -4,18 +4,20 @@ import logo from "../../public/blog.png";
 const LoginSignUp = ({
   onSubmit,
   errorMessage,
+  onChangeUsername,
+  onChangePassword,
+  username,
+  password,
   isError,
-  onUsername,
-  onPassword,
 }) => {
   return (
     <div className="login-signup">
+      {isError ? <p className="error">{errorMessage}</p> : null}
       <div className="login-header">
         <img src={logo} className="logo-img" />
         <h2>My Blog App</h2>
       </div>
       <h2>Enter your login credentials</h2>
-      {isError === true ? <p className="errors">{errorMessage}</p> : null}
       <form className="sign-in-form" onSubmit={onSubmit}>
         <label htmlFor="username">Username:</label>
         <input
@@ -24,7 +26,8 @@ const LoginSignUp = ({
           name="first"
           placeholder="Enter your Username"
           required
-          onChange={onUsername}
+          onChange={onChangeUsername}
+          value={username}
         />
 
         <label htmlFor="password">Password:</label>
@@ -34,7 +37,8 @@ const LoginSignUp = ({
           name="password"
           placeholder="Enter your Password"
           required
-          onChange={onPassword}
+          onChange={onChangePassword}
+          value={password}
         />
         <div className="wrap">
           <button type="submit">Login</button>
