@@ -1,7 +1,7 @@
 import BlogInfo from "./BlogInfo";
 import { useState } from "react";
 
-const Blog = ({ blogs, user, onRemove }) => {
+const Blog = ({ blogs, user, onRemove, onUpdate }) => {
   const [showInfo, setShowInfo] = useState(false);
   const handleShowInfo = () => {
     setShowInfo((showInfo) => !showInfo);
@@ -29,7 +29,7 @@ const Blog = ({ blogs, user, onRemove }) => {
         {showInfo === false ? (
           <p>Author: {blog.author}</p>
         ) : (
-          <BlogInfo blog={blog} />
+          <BlogInfo blog={blog} onUpdate={onUpdate}/>
         )}
       </div>
     );

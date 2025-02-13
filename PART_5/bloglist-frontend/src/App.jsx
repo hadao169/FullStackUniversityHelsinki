@@ -128,6 +128,17 @@ const App = () => {
     }
   };
 
+  const handleUpdateBlog = async (id, blogObject) => {
+    try {
+      await blogService.update(id, blogObject);
+      const updatedBlogs = await blogService.getAll();
+      setBlogs(updatedBlogs);
+    } catch (err) {
+      console.error("Error updating blog:", err);
+    }
+  };
+
+  //Render login/signup page if user is not logged in else render main page including blogs detail
   if (user === null) {
     return (
       <LoginSignUp
@@ -153,7 +164,12 @@ const App = () => {
       <Togglable buttonLabel="Create" ref={blogFormRef}>
         <AddNewBlog onAdd={handleAddBlog} />
       </Togglable>
-      <Blog blogs={blogs} user={user} onRemove={handleDeleteBlog} />
+      <Blog
+        blogs={blogs}
+        user={user}
+        onRemove={handleDeleteBlog}
+        onUpdate={handleUpdateBlog}
+      />
     </div>
   );
 };
