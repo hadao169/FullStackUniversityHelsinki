@@ -18,7 +18,7 @@ const App = () => {
   const [user, setUser] = useState(null);
   const [isError, setIsError] = useState(false);
   // const [isSignedIn, setIsSignedIn] = useState(false);
-  const [message, setMessage] = useState(null);
+  const [message, setMessage] = useState("");
   const blogFormRef = useRef();
 
   useEffect(() => {
@@ -68,7 +68,7 @@ const App = () => {
       setIsError(true);
       setMessage("Username or password is incorrect!");
       setTimeout(() => {
-        setMessage(null);
+        setMessage("");
         setIsError(false);
       }, 2000);
     }
@@ -110,7 +110,9 @@ const App = () => {
   const handleDeleteBlog = async (id) => {
     const blogRemoved = blogs.find((blog) => blog.id === id);
 
-    if (window.confirm(`Delete ${blogRemoved.title}?`)) {
+    if (
+      window.confirm(`Delete ${blogRemoved.title} by ${blogRemoved.author}?`)
+    ) {
       try {
         await blogService.deletes(id);
         setBlogs(blogs.filter((blog) => blog.id !== id));

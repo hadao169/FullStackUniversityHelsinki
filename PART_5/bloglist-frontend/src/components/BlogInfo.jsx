@@ -5,8 +5,6 @@ const BlogInfo = ({ blog, onUpdate }) => {
   };
   return (
     <ul>
-      <p>Title: {blog.title}</p>
-      <p>Author: {blog.author}</p>
       <p>URL: {blog.url}</p>
       <div className="likes">
         <p>Likes: {blog.likes} </p>

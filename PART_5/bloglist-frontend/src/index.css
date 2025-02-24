@@ -3,7 +3,6 @@ body {
 	justify-content: center;
 	align-items: center;
 	font-family: sans-serif;
-	line-height: 1.5;
 	min-height: 100vh;
 	background: #f3f3f3;
 	flex-direction: column;
@@ -113,12 +112,17 @@ button {
 .blog div {
 	display: flex;
 	justify-content: space-between;
-	align-items: center;
+	align-items: first baseline;
+}
+
+.blog div > ul{
+	margin-bottom: 0;
+	padding-bottom: 0;
 }
 
 .blog p {
 	font-size: 16px;
-	margin-left: 30px;
+	margin-bottom: 0;
 }
 
 .blog .view-button{

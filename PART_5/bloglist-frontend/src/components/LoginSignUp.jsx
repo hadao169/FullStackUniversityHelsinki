@@ -1,5 +1,6 @@
 import React from "react";
 import logo from "../../public/blog.png";
+import PropTypes from "prop-types";
 
 const LoginSignUp = ({
   onSubmit,
@@ -12,7 +13,7 @@ const LoginSignUp = ({
 }) => {
   return (
     <div className="login-signup">
-      {isError ? <p className="error">{errorMessage}</p> : null}
+      {isError && <p className="error">{errorMessage}</p>}
       <div className="login-header">
         <img src={logo} className="logo-img" />
         <h2>My Blog App</h2>
@@ -52,6 +53,16 @@ const LoginSignUp = ({
       </p>
     </div>
   );
+};
+
+LoginSignUp.propTypes = {
+  onSubmit: PropTypes.func.isRequired,
+  onChangeUsername: PropTypes.func.isRequired,
+  onChangePassword: PropTypes.func.isRequired,
+  username: PropTypes.string.isRequired,
+  password: PropTypes.string.isRequired,
+  isError: PropTypes.bool.isRequired,
+  errorMessage: PropTypes.string.isRequired,
 };
 
 export default LoginSignUp;
