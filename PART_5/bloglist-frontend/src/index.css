@@ -76,6 +76,7 @@ button {
 	padding: 4px 8px;
 	font-size: 14px;
 	font-weight: bold;
+	margin-left: 6px;
 }
 
 .errors {

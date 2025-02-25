@@ -53,7 +53,9 @@ const AddNewBlog = ({ onAdd }) => {
           onChange={handleChange}
           required
         />
-        <button type="submit">Create</button>
+        <button type="submit" id="create-btn">
+          Create
+        </button>
       </form>
     </div>
   );

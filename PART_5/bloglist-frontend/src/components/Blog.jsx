@@ -1,4 +1,3 @@
-import BlogInfo from "./BlogInfo";
 import { useState } from "react";
 
 const Blog = ({ blogs, user, onRemove, onUpdate }) => {
@@ -38,12 +37,26 @@ const Blog = ({ blogs, user, onRemove, onUpdate }) => {
               onClick={() => handleShowInfo(blog.id)}>
               {isActive ? "Hide" : "View"}
             </button>
-            <button className="view-button" onClick={() => onRemove(blog.id)}>
+            <button className="btn" onClick={() => onRemove(blog.id)}>
               Remove
             </button>
           </div>
         </div>
-        {isActive && <BlogInfo blog={blog} onUpdate={onUpdate} />}
+        {isActive && (
+          <ul>
+            <p>URL: {blog.url}</p>
+            <div className="likes">
+              <p>Likes: {blog.likes} </p>
+              <button
+                className="btn like-btn"
+                onClick={() =>
+                  onUpdate(blog.id, { ...blog, likes: blog.likes + 1 })
+                }>
+                Like
+              </button>
+            </div>
+          </ul>
+        )}
       </div>
     );
   });
