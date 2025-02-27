@@ -24,7 +24,7 @@ const LoginSignUp = ({
         <input
           type="text"
           id="username"
-          name="first"
+          name="username"
           placeholder="Enter your Username"
           required
           onChange={onChangeUsername}

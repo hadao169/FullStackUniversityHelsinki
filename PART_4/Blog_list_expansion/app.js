@@ -15,6 +15,7 @@ import blogRouter from "./controllers/blogController.js";
 import userRouter from "./controllers/userController.js";
 import morgan from "morgan";
 import loginRouter from "./controllers/loginController.js";
+import testingRouter from "./controllers/testing.js";
 
 mongoose.set("strictQuery", false);
 
@@ -50,7 +51,10 @@ app.use("/api/blogs", blogRouter);
 app.use("/api/users", userRouter);
 app.use("/api/login", loginRouter);
 
+if (process.env.NODE_ENV === "test") {
+  app.use("/api/testing", testingRouter);
+}
+
 app.use(unknownEndpoint);
 app.use(errorHandler);
-
 export default app;
