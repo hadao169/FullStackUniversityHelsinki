@@ -13,4 +13,4 @@ const createBlog = async (page, blog) => {
   await page.getByRole("button", { name: "Create" }).click();
 };
 
-export { loginWith, createBlog };
+export { loginWith, createBlog }
