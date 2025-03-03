@@ -94,5 +94,62 @@ test.describe("Blog app", () => {
         });
       });
     });
+
+    test.describe("test sort function", () => {
+      test.afterEach(async ({ page }) => {
+        await page.getByRole("button", { name: "Sign out" }).click();
+      });
+
+      test("Blogs are sorted by the number of likes in descending order", async ({
+        page,
+      }) => {
+        const BLOGS = [
+          {
+            title: "The Future of Automation Engineering",
+            author: "John Doe",
+            url: "https://example.com/future-of-automation",
+          },
+          {
+            title: "Web Development Trends in 2025",
+            author: "Jane Smith",
+            url: "https://example.com/web-dev-trends-2025",
+          },
+          {
+            title: "Mastering Virtualization with VMware and KVM",
+            author: "Alex Johnson",
+            url: "https://example.com/mastering-virtualization",
+          },
+        ];
+
+        await createBlog(page, BLOGS[0]);
+        await createBlog(page, BLOGS[1]);
+        await createBlog(page, BLOGS[2]);
+
+        const blogs = page.locator(".blog");
+
+        // Open all blogs
+        for (let i = 0; i < 3; i++) {
+          await blogs.nth(i).getByRole("button", { name: "View" }).click();
+        }
+
+        // Like blogs with increasing likes
+        for (let i = 0; i < 3; i++) {
+          const clicks = i + 1;
+          for (let j = 0; j < clicks; j++) {
+            await blogs.nth(i).getByRole("button", { name: "Like" }).click();
+          }
+        }
+
+        // Verify sorting by likes
+        const likes = await blogs.allTextContents();
+        const sortedLikes = likes
+          .map((text) => parseInt(text.match(/Likes: (\d+)/)[1], 10))
+          .slice(0, 3); // Extract likes and ensure we only have 3 blogs
+        const isSorted = sortedLikes.every(
+          (val, i, arr) => !i || val <= arr[i - 1]
+        );
+        expect(isSorted).toBeTruthy();
+      });
+    });
   });
 });
