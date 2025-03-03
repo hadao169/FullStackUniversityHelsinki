@@ -28,7 +28,7 @@ function App() {
     axios
       .get("https://studies.cs.helsinki.fi/restcountries/api/all")
       .then((response) => {
-        setCountries(response.data);
+        setCountries(response.data)
       })
       .catch((error) => {
         console.log(error);
