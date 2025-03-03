@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-const Blog = ({ blogs, user, onRemove, onUpdate }) => {
+const Blog = ({ blogs, onRemove, onUpdate, user }) => {
   const [activeBlogIds, setActiveBlogIds] = useState([]);
 
   const handleShowInfo = (id) => {
@@ -16,14 +16,11 @@ const Blog = ({ blogs, user, onRemove, onUpdate }) => {
     });
   };
 
-  const filteredBlogs = blogs.filter(
-    (blog) => blog.user.username === user.username
-  );
-
-  const sortedBlogs = filteredBlogs.sort((a, b) => b.likes - a.likes);
+  const sortedBlogs = blogs.sort((a, b) => b.likes - a.likes);
 
   return sortedBlogs.map((blog) => {
     const isActive = activeBlogIds.includes(blog.id);
+    const isUser = blog.user.username === user.username;
     return (
       <div key={blog.id} className="blog">
         <div>
@@ -37,9 +34,11 @@ const Blog = ({ blogs, user, onRemove, onUpdate }) => {
               onClick={() => handleShowInfo(blog.id)}>
               {isActive ? "Hide" : "View"}
             </button>
-            <button className="btn" onClick={() => onRemove(blog.id)}>
-              Remove
-            </button>
+            {isActive && isUser ? (
+              <button className="btn" onClick={() => onRemove(blog.id)}>
+                Remove
+              </button>
+            ) : null}
           </div>
         </div>
         {isActive && (

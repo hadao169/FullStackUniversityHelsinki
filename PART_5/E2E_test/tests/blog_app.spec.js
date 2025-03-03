@@ -10,6 +10,14 @@ test.describe("Blog app", () => {
         password: "admin",
       },
     });
+
+    await request.post("http://localhost:3003/api/users", {
+      data: {
+        name: "Dao Ha 2",
+        username: "admin123",
+        password: "admin123",
+      },
+    });
     await page.goto("http://localhost:5173");
   });
 
@@ -62,6 +70,28 @@ test.describe("Blog app", () => {
         await page.getByRole("button", { name: "Like" }).click();
         const like = page.locator(".likes > p");
         await expect(like).toContainText("Likes: 1");
+      });
+
+      test("Remove a blog by loggod-in user", async ({ page }) => {
+        await page.getByRole("button", { name: "View" }).click();
+        await page.on("dialog", (dialog) => dialog.accept());
+        await page.getByRole("button", { name: "Remove" }).click();
+      });
+
+      test.describe("Remove button visibility", () => {
+        test("Owner can see the button", async ({ page }) => {
+          await page.getByRole("button", { name: "View" }).click();
+          await expect(page.locator('button:has-text("Remove")')).toBeVisible();
+        });
+
+        test("Not owner can not see the button", async ({ page }) => {
+          await page.getByRole("button", { name: "Sign out" }).click();
+          await loginWith(page, "admin123", "admin123");
+          await page.getByRole("button", { name: "View" }).click();
+          await expect(
+            page.locator('button:has-text("Remove")')
+          ).not.toBeVisible();
+        });
       });
     });
   });

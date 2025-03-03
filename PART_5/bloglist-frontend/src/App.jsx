@@ -168,9 +168,9 @@ const App = () => {
       </Togglable>
       <Blog
         blogs={blogs}
-        user={user}
         onRemove={handleDeleteBlog}
         onUpdate={handleUpdateBlog}
+        user={user}
       />
     </div>
   );
