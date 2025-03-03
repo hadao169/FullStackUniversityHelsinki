@@ -95,7 +95,7 @@ const App = () => {
     const newContact = {
       name: newName,
       number: newNumber,
-      id: (persons.length + 1).toString(),
+      id: Math.floor(Math.random() * 1000000).toString(),
     };
 
     if (!isDuplicate(persons)) {
@@ -142,6 +142,15 @@ const App = () => {
             })
             .catch((err) => {
               console.log("Errors occurred", err);
+              setError(true);
+              setMessage(
+                `Information about ${updatedPerson.name} was deleted from the server!`
+              );
+              setPersons(persons.filter((n) => n.id !== changedPerson.id));
+              setTimeout(() => {
+                setMessage("");
+                setError(false);
+              }, 4000);
             });
         }
       }
@@ -171,13 +180,11 @@ const App = () => {
         .then(() => {
           // Update state by filtering out the deleted contact
           setPersons(persons.filter((person) => person.id !== id));
-          setError(true);
           setMessage(
             `${contactRemoved.name} has been deleted from the server!`
           );
           setTimeout(() => {
             setMessage("");
-            setError(false);
           }, 4000);
         })
         .catch((err) => {
