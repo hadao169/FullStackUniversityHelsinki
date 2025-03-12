@@ -8,9 +8,8 @@ const AnecdoteList = () => {
     if (state.filter === "ALL") {
       return state.anecdotes;
     }
-
-    console.log(state.filter);
-    console.log(state.anecdotes);
+    // console.log(state.filter);
+    // console.log(state.anecdotes);
 
     return state.anecdotes.filter((anecdote) =>
       anecdote.content.toLowerCase().includes(state.filter.toLowerCase())

@@ -8,5 +8,5 @@
 
 - Library: 
 	+ deep-freeze: make the reducer be correctly defined as an immutable function
-
+	+ Redux-toolkit
 - Note: In JS function, default function parameters allow named parameters to be initialized with default values if no value or undefined is passed.
