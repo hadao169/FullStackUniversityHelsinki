@@ -1,0 +1,12 @@
+- Redux:
+	+ Store: stores the state 
+	+ Action: the state of the store is changed with Action
+	+ Reducer: define the impact of the action to the state of the application
+	+ Dispatch: uses to send the actions handled by reducer
+
+- Note: If there is any change in the state, only replace the old object with the a new, changed object. (don't change the original object)
+
+- Library: 
+	+ deep-freeze: make the reducer be correctly defined as an immutable function
+
+- Note: In JS function, default function parameters allow named parameters to be initialized with default values if no value or undefined is passed.
