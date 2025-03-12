@@ -1,11 +1,28 @@
 import { useSelector, useDispatch } from "react-redux";
 import { voteForAnecdote } from "../reducers/anecdoteReducer";
 const AnecdoteList = () => {
-  const anecdotes = useSelector((state) => state);
   const dispatch = useDispatch();
+
+  // Get the anecdotes based on the current filter (ALL, IMPORTANT, or NOT IMPORTANT)
+  const anecdotes = useSelector((state) => {
+    if (state.filter === "ALL") {
+      return state.anecdotes;
+    }
+
+    console.log(state.filter);
+    console.log(state.anecdotes);
+
+    return state.anecdotes.filter((anecdote) =>
+      anecdote.content.toLowerCase().includes(state.filter.toLowerCase())
+    );
+  });
+  console.log(anecdotes);
+
+  // Increase the votes of the anecdote with the given id
   const vote = (id) => {
     dispatch(voteForAnecdote(id));
   };
+
   return (
     <div>
       {anecdotes
