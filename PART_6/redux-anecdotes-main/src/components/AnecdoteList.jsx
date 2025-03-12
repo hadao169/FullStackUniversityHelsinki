@@ -1,5 +1,5 @@
 import { useSelector, useDispatch } from "react-redux";
-import { voteForAnecdote } from "../reducers/anecdoteReducer";
+import { vote } from "../reducers/anecdoteReducer";
 const AnecdoteList = () => {
   const dispatch = useDispatch();
 
@@ -18,20 +18,20 @@ const AnecdoteList = () => {
   console.log(anecdotes);
 
   // Increase the votes of the anecdote with the given id
-  const vote = (id) => {
-    dispatch(voteForAnecdote(id));
+  const voteAnecdote = (id) => {
+    dispatch(vote(id));
   };
 
   return (
     <div>
-      {anecdotes
+      {[...anecdotes]
         .sort((a, b) => b.votes - a.votes)
         .map((anecdote) => (
           <div key={anecdote.id}>
             <div>{anecdote.content}</div>
             <div>
               has {anecdote.votes}
-              <button onClick={() => vote(anecdote.id)}>vote</button>
+              <button onClick={() => voteAnecdote(anecdote.id)}>vote</button>
             </div>
           </div>
         ))}
