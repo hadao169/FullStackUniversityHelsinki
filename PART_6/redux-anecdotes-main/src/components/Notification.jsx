@@ -1,5 +1,4 @@
 import { useSelector } from "react-redux";
-
 const Notification = () => {
   const notification = useSelector((state) => state.notification);
   const style = {
@@ -7,7 +6,7 @@ const Notification = () => {
     padding: 10,
     borderWidth: 1,
   };
-  return <div style={style}>You voted &quot;{notification}&quot;</div>;
+  return <div style={style}>{notification}</div>;
 };
 
 export default Notification;

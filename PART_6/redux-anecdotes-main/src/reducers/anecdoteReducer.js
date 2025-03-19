@@ -37,7 +37,11 @@ const anecdoteSlicer = createSlice({
       );
     },
 
-    addAnecdote: (state, action) => [...state, action.payload],
+    addAnecdote: (state, action) => {
+      console.log(action.payload);
+      const newAnecdote = asObject(action.payload);
+      return [...state, newAnecdote];
+    },
   },
 });
 
