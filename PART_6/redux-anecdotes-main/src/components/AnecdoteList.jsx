@@ -3,13 +3,13 @@ import { vote } from "../reducers/anecdoteReducer";
 const AnecdoteList = () => {
   const dispatch = useDispatch();
 
-  // Get the anecdotes based on the current filter (ALL, IMPORTANT, or NOT IMPORTANT)
+  // Get the anecdotes based on the current filter
   const anecdotes = useSelector((state) => {
     if (state.filter === "ALL") {
       return state.anecdotes;
     }
-    // console.log(state.filter);
-    // console.log(state.anecdotes);
+    console.log(state.filter);
+    console.log(state.anecdotes);
 
     return state.anecdotes.filter((anecdote) =>
       anecdote.content.toLowerCase().includes(state.filter.toLowerCase())
