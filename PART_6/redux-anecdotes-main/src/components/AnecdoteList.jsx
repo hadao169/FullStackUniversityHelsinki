@@ -1,6 +1,6 @@
 import { useSelector, useDispatch } from "react-redux";
 import { voteAnecdote } from "../reducers/anecdoteReducer";
-import { voteNoti, removeNoti } from "../reducers/notificationReducer";
+import { setNotification } from "../reducers/notificationReducer";
 
 const AnecdoteList = () => {
   const dispatch = useDispatch();
@@ -10,24 +10,18 @@ const AnecdoteList = () => {
     if (state.filter === "ALL") {
       return state.anecdotes;
     }
-    console.log(state.filter);
-    console.log(state.anecdotes);
 
     return state.anecdotes.filter((anecdote) =>
       anecdote.content.toLowerCase().includes(state.filter.toLowerCase())
     );
   });
-  console.log(anecdotes);
 
   // Increase the votes of the anecdote with the given id
   const votesAnecdote = (id) => {
     const anecdote = anecdotes.find((anecdotes) => anecdotes.id === id);
     const votedAnecdote = { ...anecdote, votes: anecdote.votes + 1 };
     dispatch(voteAnecdote(id, votedAnecdote));
-    dispatch(voteNoti(anecdote.content));
-    setTimeout(() => {
-      dispatch(removeNoti(""));
-    }, 5000);
+    dispatch(setNotification(`you voted '${anecdote.content}'`, 5));
   };
 
   return (
