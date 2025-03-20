@@ -31,8 +31,18 @@
       "votes": 0
     },
     {
-      "id": "ef2d",
+      "id": "4ba8",
+      "content": "Hello world",
+      "vote": 0
+    },
+    {
+      "id": "12c5",
       "content": "Hello world 2",
+      "vote": 0
+    },
+    {
+      "id": "f603",
+      "content": "Hello world 3",
       "vote": 0
     }
   ]
