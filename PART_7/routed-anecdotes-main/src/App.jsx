@@ -1,6 +1,12 @@
 import { useState } from "react";
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
-import { useParams } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Link,
+  useParams,
+  useNavigate,
+} from "react-router-dom";
 const Menu = ({ anecdotes, addNew }) => {
   const padding = {
     paddingRight: 5,
@@ -13,14 +19,17 @@ const Menu = ({ anecdotes, addNew }) => {
             anecdotes
           </Link>
           <Link style={padding} to="/about">
-            create new
+            about
           </Link>
           <Link style={padding} to="/create">
-            about
+            create new
           </Link>
         </div>
         <Routes>
-          <Route path="/anecdotes/:id" element={<Anecdote anecdotes={anecdotes}/>}/>
+          <Route
+            path="/anecdotes/:id"
+            element={<Anecdote anecdotes={anecdotes} />}
+          />
           <Route path="/" element={<AnecdoteList anecdotes={anecdotes} />} />
           <Route path="/about" element={<About />} />
           <Route path="/create" element={<CreateNew addNew={addNew} />} />
@@ -54,7 +63,7 @@ const Anecdote = ({ anecdotes }) => {
       <p></p>
     </div>
   );
-}
+};
 
 const About = () => (
   <div>
@@ -94,6 +103,8 @@ const CreateNew = (props) => {
   const [author, setAuthor] = useState("");
   const [info, setInfo] = useState("");
 
+  const navigate = useNavigate();
+
   const handleSubmit = (e) => {
     e.preventDefault();
     props.addNew({
@@ -102,6 +113,7 @@ const CreateNew = (props) => {
       info,
       votes: 0,
     });
+    navigate("/");
   };
 
   return (
