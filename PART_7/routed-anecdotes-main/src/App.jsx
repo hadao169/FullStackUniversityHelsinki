@@ -7,6 +7,7 @@ import {
   useParams,
   useNavigate,
 } from "react-router-dom";
+import { useField } from "./hooks";
 const Menu = ({ anecdotes, addNew }) => {
   const padding = {
     paddingRight: 5,
@@ -32,7 +33,7 @@ const Menu = ({ anecdotes, addNew }) => {
           />
           <Route path="/" element={<AnecdoteList anecdotes={anecdotes} />} />
           <Route path="/about" element={<About />} />
-          <Route path="/create" element={<CreateNew addNew={addNew} />} />
+          <Route path="/create" element={<CreateNew onAdd={addNew} />} />
         </Routes>
       </Router>
     </div>
@@ -55,6 +56,7 @@ const AnecdoteList = ({ anecdotes }) => (
 const Anecdote = ({ anecdotes }) => {
   const id = useParams().id;
   const anecdote = anecdotes.find((a) => a.id === Number(id));
+  console.log(anecdote);
   return (
     <div>
       <h2>{anecdote.content}</h2>
@@ -98,22 +100,81 @@ const Footer = () => (
   </div>
 );
 
-const CreateNew = (props) => {
-  const [content, setContent] = useState("");
-  const [author, setAuthor] = useState("");
-  const [info, setInfo] = useState("");
+// const CreateNew = ({ onAdd }) => {
+//   const [content, setContent] = useState("");
+//   const [author, setAuthor] = useState("");
+//   const [info, setInfo] = useState("");
 
+//   const navigate = useNavigate();
+
+//   const handleSubmit = (e) => {
+//     e.preventDefault();
+//     onAdd({
+//       content,
+//       author,
+//       info,
+//       votes: 0,
+//     });
+//     navigate("/");
+//   };
+
+//   return (
+//     <div>
+//       <h2>create a new anecdote</h2>
+//       <form onSubmit={handleSubmit}>
+//         <div>
+//           content
+//           <input
+//             name="content"
+//             value={content}
+//             onChange={(e) => setContent(e.target.value)}
+//           />
+//         </div>
+//         <div>
+//           author
+//           <input
+//             name="author"
+//             value={author}
+//             onChange={(e) => setAuthor(e.target.value)}
+//           />
+//         </div>
+//         <div>
+//           url for more info
+//           <input
+//             name="info"
+//             value={info}
+//             onChange={(e) => setInfo(e.target.value)}
+//           />
+//         </div>
+//         <button>create</button>
+//       </form>
+//     </div>
+//   );
+// };
+
+const CreateNew = ({ onAdd }) => {
+  const content = useField("text");
+  const author = useField("text");
+  const info = useField("text");
   const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    props.addNew({
-      content,
-      author,
-      info,
+
+    onAdd({
+      content: content.value,
+      author: author.value,
+      info: info.value,
       votes: 0,
     });
+
     navigate("/");
+  };
+
+  const handleReset = () => {
+    content.onChange({ target: { value: "" } });
+    author.onChange({ target: { value: "" } });
+    info.onChange({ target: { value: "" } });
   };
 
   return (
@@ -122,29 +183,22 @@ const CreateNew = (props) => {
       <form onSubmit={handleSubmit}>
         <div>
           content
-          <input
-            name="content"
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-          />
+          <input {...content} />
         </div>
         <div>
           author
-          <input
-            name="author"
-            value={author}
-            onChange={(e) => setAuthor(e.target.value)}
-          />
+          <input {...author} />
         </div>
         <div>
           url for more info
-          <input
-            name="info"
-            value={info}
-            onChange={(e) => setInfo(e.target.value)}
-          />
+          <input {...info} />
         </div>
-        <button>create</button>
+        <button type="submit" name="create">
+          create
+        </button>
+        <button type="button" onClick={handleReset}>
+          reset
+        </button>
       </form>
     </div>
   );
